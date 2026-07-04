@@ -104,6 +104,7 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
   .wheel-container{width:260px;height:260px}
 }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -112,13 +113,11 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
   <div class="center">
     <h1 class="logo">🌍 صراع القارات</h1>
     <p class="sub">النسخة الملكية — معركة ثقافية على خريطة العالم</p>
-    
     <div class="card" style="width:100%;max-width:420px">
       <div class="row" style="margin-bottom:12px">
         <div class="mode-chip on" id="modeTeam" onclick="setMode('team')">⚔️ فريقان</div>
         <div class="mode-chip" id="modeSolo" onclick="setMode('solo')">👤 فردي</div>
       </div>
-      
       <div id="teamSetup" style="margin-bottom:10px">
         <div class="row" style="margin-bottom:8px">
           <div class="mode-chip on" id="winPoints" onclick="setWin('points')">🏆 نقاط</div>
@@ -126,7 +125,6 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
         </div>
         <input id="targetInput" class="inp" type="number" value="700" min="100" max="5000" step="50" placeholder="الهدف (نقطة/دولة)" style="margin-bottom:10px">
       </div>
-      
       <input id="playerName" class="inp" placeholder="اسمك (مثال: سامي)" maxlength="16" style="margin-bottom:10px">
       <button class="btn-gold" style="width:100%" onclick="createRoom()">⚔️ إنشاء غرفة</button>
       <div style="margin:12px 0;text-align:center;color:var(--muted);font-size:13px">— أو —</div>
@@ -146,10 +144,8 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
           <h2 style="color:var(--gold);font-size:18px">ردهة الانتظار</h2>
           <span></span>
         </div>
-        
         <div class="code-big" id="lobbyCode" onclick="copyCode()">----</div>
         <p style="text-align:center;color:var(--muted);font-size:12px;margin-top:6px">اضغط لنسخ الكود وشاركه</p>
-        
         <div class="score-bar" style="margin-top:14px">
           <div class="score-badge" style="background:rgba(59,130,246,0.25);border:1px solid var(--blue)" id="blueScore">🔵 0</div>
           <div style="text-align:center">
@@ -159,7 +155,6 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
           <div class="score-badge" style="background:rgba(239,68,68,0.25);border:1px solid var(--red)" id="redScore">🔴 0</div>
         </div>
       </div>
-      
       <div class="teams" style="margin-top:10px">
         <div class="team-panel blue">
           <div class="tp-title"><span>🔵 الفريق الأزرق</span><span id="blueCount">0</span></div>
@@ -170,13 +165,11 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
           <div id="redList"></div>
         </div>
       </div>
-      
       <div id="hostStart" style="display:none;margin-top:14px">
         <button class="btn-gold" style="width:100%" onclick="startGame()" id="startBtn">⚔️ ابدأ المعركة</button>
       </div>
       <div id="waitStart" style="display:none;margin-top:14px;text-align:center;color:var(--muted);font-size:14px">بانتظار قائد الغرفة…</div>
     </div>
-    
     <div class="game-side">
       <div class="card">
         <div class="section">👥 اللاعبون</div>
@@ -200,11 +193,9 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
           <div class="score-badge" style="background:rgba(239,68,68,0.25);border:1px solid var(--red)" id="gameRedScore">🔴 0</div>
         </div>
       </div>
-      
       <div class="map-wrap" id="mapWrap">
         <svg id="mapSvg" viewBox="0 0 960 500"></svg>
       </div>
-      
       <div id="hostControls" style="display:none;margin-top:10px">
         <div class="row">
           <button class="btn-gold" onclick="openWheel()">🎯 دوران العجلة</button>
@@ -213,7 +204,6 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
         </div>
       </div>
     </div>
-    
     <div class="game-side">
       <div class="card">
         <div class="section">📜 السجل</div>
@@ -259,18 +249,22 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
 
 <script>
 /* ═══════════════════════════════════════
-   CONFIG & STATE
+   FIREBASE CONFIG — awalem-20277
    ═══════════════════════════════════════ */
 const firebaseConfig = {
-  apiKey: "AIzaSyD2gR4jhbUIXw8j9Qc4tVlWg1oX1Q1X1Q1",
-  authDomain: "awalem-2027.firebaseapp.com",
-  databaseURL: "https://awalem-2027-default-rtdb.firebaseio.com",
-  projectId: "awalem-2027",
-  storageBucket: "awalem-2027.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890"
+  apiKey: "AIzaSyBRQNV4VHt5pUfbUB-ntgWlz4T1D3no8WTQ",
+  authDomain: "awalem-20277.firebaseapp.com",
+  databaseURL: "https://awalem-20277-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "awalem-20277",
+  storageBucket: "awalem-20277.firebasestorage.app",
+  messagingSenderId: "1017386077067",
+  appId: "1:1017386077067:web:483a2ac4a8bd042d62bd8e",
+  measurementId: "G-BHNH69C81"
 };
 
+/* ═══════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════ */
 let db = null;
 let roomRef = null;
 let roomCode = null;
@@ -282,6 +276,11 @@ let winType = 'points';
 let target = 700;
 let currentTurn = 'blue';
 let timerInterval = null;
+let selectedContinent = null;
+let wheelAngle = 0;
+let isSpinning = false;
+let currentQuestion = null;
+let timeLeft = 15;
 
 const state = {
   players: {},
@@ -309,17 +308,35 @@ const WHEEL_ITEMS = [
   { label: 'أوقيانوسيا', color: '#8B5CF6', continent: 'Oceania' },
 ];
 
+const QUESTIONS = [
+  {q:'ما هي عاصمة المملكة العربية السعودية؟',a:'الرياض',cat:'جغرافيا'},
+  {q:'ما هو أكبر محيط في العالم؟',a:'المحيط الهادئ',cat:'جغرافيا'},
+  {q:'في أي قارة تقع مصر؟',a:'أفريقيا',cat:'جغرافيا'},
+  {q:'ما هي عاصمة فرنسا؟',a:'باريس',cat:'جغرافيا'},
+  {q:'كم عدد القارات في العالم؟',a:'6',cat:'جغرافيا'},
+  {q:'ما هو أطول نهر في العالم؟',a:'نيل',cat:'جغرافيا'},
+  {q:'في أي دولة تقع الأهرامات؟',a:'مصر',cat:'تاريخ'},
+  {q:'متى اكتشف كولومبوس أمريكا؟',a:'1492',cat:'تاريخ'},
+  {q:'من هو مؤسس الدولة السعودية الأولى؟',a:'محمد بن سعود',cat:'تاريخ'},
+  {q:'كم عدد أيام الحرب العالمية الثانية؟',a:'6 سنوات',cat:'تاريخ'},
+  {q:'ما هي عاصمة اليابان؟',a:'طوكيو',cat:'جغرافيا'},
+  {q:'كم عدد ألوان قوس قزح؟',a:'7',cat:'علوم'},
+  {q:'ما هو أسرع حيوان بري؟',a:'الفهد',cat:'علوم'},
+  {q:'كم عدد كواكب المجموعة الشمسية؟',a:'8',cat:'علوم'},
+  {q:'ما هو العنصر الكيميائي للذهب؟',a:'Au',cat:'علوم'},
+];
+
 /* ═══════════════════════════════════════
-   FIREBASE
+   FIREBASE INIT
    ═══════════════════════════════════════ */
 function initFirebase() {
   try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
-    console.log('Firebase connected');
+    console.log('Firebase connected to awalem-20277');
   } catch(e) {
     console.error('Firebase init error:', e);
-    showToast('تعذر الاتصال بقاعدة البيانات');
+    showToast('تعذر الاتصال بقاعدة البيانات: ' + e.message);
   }
 }
 
@@ -378,9 +395,9 @@ function createRoom() {
   playerId = generateId();
   roomCode = generateCode();
   target = parseInt(document.getElementById('targetInput').value) || 700;
-  
+
   if(!db) { showToast('Firebase غير متصل'); return; }
-  
+
   const roomData = {
     code: roomCode,
     host: playerId,
@@ -404,7 +421,7 @@ function createRoom() {
     currentTurn: 'blue',
     round: 1
   };
-  
+
   db.ref('rooms/' + roomCode).set(roomData)
     .then(() => {
       isHost = true;
@@ -419,26 +436,27 @@ function createRoom() {
 function joinRoom() {
   const code = document.getElementById('joinCode').value.trim().toUpperCase();
   const name = document.getElementById('playerName').value.trim();
-  
+
   if(!/^[A-Z0-9]{4}$/.test(code)) { showToast('أدخل كود صحيح (4 رموز)'); return; }
   if(!name) { showToast('أدخل اسمك أولاً'); return; }
-  
+
   playerName = name;
   playerId = generateId();
   roomCode = code;
-  
+
   if(!db) { showToast('Firebase غير متصل'); return; }
-  
+
   const roomRef = db.ref('rooms/' + code);
   roomRef.once('value').then(snap => {
     const room = snap.val();
     if(!room) { showToast('الغرفة غير موجودة!'); return; }
     if(room.status === 'finished') { showToast('اللعبة منتهية'); return; }
-    
-    const team = room.mode === 'team' ? 
-      (Object.values(room.players || {}).filter(p => p.team === 'blue').length <= 
-       Object.values(room.players || {}).filter(p => p.team === 'red').length ? 'blue' : 'red') : 'solo';
-    
+
+    const players = Object.values(room.players || {});
+    const blueCount = players.filter(p => p.team === 'blue').length;
+    const redCount = players.filter(p => p.team === 'red').length;
+    const team = room.mode === 'team' ? (blueCount <= redCount ? 'blue' : 'red') : 'solo';
+
     return db.ref('rooms/' + code + '/players/' + playerId).set({
       id: playerId,
       name: playerName,
@@ -472,7 +490,7 @@ function enterLobby() {
   document.getElementById('lobbyCode').textContent = roomCode;
   document.getElementById('lobbyMode').textContent = gameMode === 'team' ? 'فريقان' : 'فردي';
   document.getElementById('lobbyWin').textContent = 'الفوز: ' + target + ' ' + (winType==='points'?'نقطة':'دولة');
-  
+
   roomRef = db.ref('rooms/' + roomCode);
   roomRef.on('value', snap => {
     const room = snap.val();
@@ -494,23 +512,23 @@ function updateLobby(room) {
   const players = Object.values(room.players || {});
   const blue = players.filter(p => p.team === 'blue');
   const red = players.filter(p => p.team === 'red');
-  
+
   document.getElementById('blueCount').textContent = blue.length;
   document.getElementById('redCount').textContent = red.length;
   document.getElementById('blueScore').textContent = '🔵 ' + (room.scores?.blue || 0);
   document.getElementById('redScore').textContent = '🔴 ' + (room.scores?.red || 0);
-  
-  document.getElementById('blueList').innerHTML = blue.map(p => 
+
+  document.getElementById('blueList').innerHTML = blue.map(p =>
     `<div class="pl-row">${p.name} ${p.id===room.host?'<span class="host-tag">قائد</span>':''} ${p.id===playerId?'(أنت)':''}</div>`
   ).join('');
-  document.getElementById('redList').innerHTML = red.map(p => 
+  document.getElementById('redList').innerHTML = red.map(p =>
     `<div class="pl-row">${p.name} ${p.id===room.host?'<span class="host-tag">قائد</span>':''} ${p.id===playerId?'(أنت)':''}</div>`
   ).join('');
-  
-  document.getElementById('allPlayers').innerHTML = players.map(p => 
+
+  document.getElementById('allPlayers').innerHTML = players.map(p =>
     `<div style="margin-bottom:4px">${p.name} ${p.id===playerId?'<span style="color:var(--accent)">(أنت)</span>':''}</div>`
   ).join('');
-  
+
   const isHostPlayer = (room.host === playerId);
   document.getElementById('hostStart').style.display = isHostPlayer ? 'block' : 'none';
   document.getElementById('waitStart').style.display = !isHostPlayer ? 'block' : 'none';
@@ -536,28 +554,24 @@ function endGame() {
    MAP (D3 + TopoJSON)
    ═══════════════════════════════════════ */
 let svg, path, g;
-let selectedContinent = null;
 
 function initMap() {
   svg = d3.select('#mapSvg');
   svg.selectAll('*').remove();
-  
+
   const width = 960, height = 500;
   const projection = d3.geoNaturalEarth1().scale(160).translate([width/2, height/2]);
   path = d3.geoPath().projection(projection);
-  
-  // defs
+
   const defs = svg.append('defs');
-  
-  // Ocean gradient
+
   const oceanGrad = defs.append('radialGradient').attr('id','oceanGrad')
     .attr('cx','42%').attr('cy','42%').attr('r','75%');
   oceanGrad.append('stop').attr('offset','0%').attr('stop-color','#38BDF8').attr('stop-opacity',0.9);
   oceanGrad.append('stop').attr('offset','44%').attr('stop-color','#0EA5E9').attr('stop-opacity',0.85);
   oceanGrad.append('stop').attr('offset','78%').attr('stop-color','#0369A1').attr('stop-opacity',0.9);
   oceanGrad.append('stop').attr('offset','100%').attr('stop-color','#082F49').attr('stop-opacity',1);
-  
-  // Continent gradients
+
   Object.entries(CONTINENTS).forEach(([key, c]) => {
     const grad = defs.append('linearGradient').attr('id','grad_'+key.replace(/ /g,'_'))
       .attr('x1',0).attr('y1',0).attr('x2',1).attr('y2',1);
@@ -565,24 +579,18 @@ function initMap() {
     grad.append('stop').attr('offset','0.5').attr('stop-color',c.grad[1]);
     grad.append('stop').attr('offset','1').attr('stop-color',c.grad[2]);
   });
-  
-  // Ocean rect
+
   svg.append('rect').attr('class','ocean-grad').attr('x',-width).attr('y',-height).attr('width',width*3).attr('height',height*3);
-  
-  // Graticule
+
   const graticule = d3.geoGraticule();
   svg.append('path').datum(graticule()).attr('class','graticule').attr('d',path);
-  
+
   g = svg.append('g');
-  
-  // Load world data
+
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(world => {
     const countries = topojson.feature(world, world.objects.countries);
-    
-    // Country to continent mapping (simplified)
+
     const countryContinent = {};
-    // We'll use a centroid-based heuristic or predefined mapping for major countries
-    // For demo, we'll color based on centroid longitude/latitude ranges
     countries.features.forEach(d => {
       const centroid = d3.geoCentroid(d);
       const [lon, lat] = centroid;
@@ -595,7 +603,7 @@ function initMap() {
       else if(lon > 110 && lat < -10) cont = 'Oceania';
       countryContinent[d.id] = cont;
     });
-    
+
     g.selectAll('path')
       .data(countries.features)
       .enter().append('path')
@@ -610,8 +618,7 @@ function initMap() {
         const cont = d3.select(this).attr('data-continent');
         if(cont) selectContinent(cont);
       });
-    
-    // Continent labels
+
     Object.entries(CONTINENTS).forEach(([key, c]) => {
       const center = continentCenter(key);
       if(center) {
@@ -646,7 +653,6 @@ function continentCenter(name) {
 function selectContinent(name) {
   selectedContinent = name;
   showToast('🎯 تم اختيار: ' + CONTINENTS[name].ar);
-  // Highlight
   d3.selectAll('.country').style('opacity', function() {
     return d3.select(this).attr('data-continent') === name ? 1 : 0.3;
   });
@@ -655,39 +661,36 @@ function selectContinent(name) {
 /* ═══════════════════════════════════════
    WHEEL
    ═══════════════════════════════════════ */
-let wheelAngle = 0;
-let isSpinning = false;
-
 function drawWheel() {
   const svg = d3.select('#wheelSvg');
   svg.selectAll('*').remove();
   const r = 100;
   const cx = 100, cy = 100;
   const slice = 360 / WHEEL_ITEMS.length;
-  
+
   const g = svg.append('g').attr('transform', `translate(${cx},${cy})`);
-  
+
   WHEEL_ITEMS.forEach((item, i) => {
     const startAngle = (i * slice - 90) * Math.PI / 180;
     const endAngle = ((i+1) * slice - 90) * Math.PI / 180;
-    
+
     const arc = d3.arc()
       .innerRadius(30)
       .outerRadius(r-4)
       .startAngle(startAngle)
       .endAngle(endAngle);
-    
+
     g.append('path')
       .attr('d', arc)
       .attr('fill', item.color)
       .attr('stroke', '#0B1220')
       .attr('stroke-width', 2);
-    
+
     const textAngle = (i * slice + slice/2 - 90) * Math.PI / 180;
     const tr = r - 28;
     const tx = Math.cos(textAngle) * tr;
     const ty = Math.sin(textAngle) * tr;
-    
+
     g.append('text')
       .attr('x', tx)
       .attr('y', ty)
@@ -711,25 +714,25 @@ function spinWheel() {
   isSpinning = true;
   const btn = document.getElementById('spinBtn');
   btn.disabled = true;
-  
+
   const extraSpins = 5 + Math.floor(Math.random() * 3);
   const slice = 360 / WHEEL_ITEMS.length;
   const targetIndex = Math.floor(Math.random() * WHEEL_ITEMS.length);
   const targetAngle = targetIndex * slice + slice/2;
   const finalAngle = 360 * extraSpins + targetAngle;
-  
+
   const wheelG = d3.select('#wheelSvg g');
   const duration = 4000;
   const start = performance.now();
   const startAngle = wheelAngle;
-  
+
   function animate(now) {
     const elapsed = now - start;
     const t = Math.min(elapsed / duration, 1);
     const ease = 1 - Math.pow(1 - t, 3);
     const current = startAngle + (finalAngle - startAngle) * ease;
     wheelG.attr('transform', `translate(100,100) rotate(${current})`);
-    
+
     if(t < 1) {
       requestAnimationFrame(animate);
     } else {
@@ -750,27 +753,6 @@ function spinWheel() {
 /* ═══════════════════════════════════════
    QUESTION
    ═══════════════════════════════════════ */
-const QUESTIONS = [
-  {q:'ما هي عاصمة المملكة العربية السعودية؟',a:'الرياض',cat:'جغرافيا'},
-  {q:'ما هو أكبر محيط في العالم؟',a:'المحيط الهادئ',cat:'جغرافيا'},
-  {q:'في أي قارة تقع مصر؟',a:'أفريقيا',cat:'جغرافيا'},
-  {q:'ما هي عاصمة فرنسا؟',a:'باريس',cat:'جغرافيا'},
-  {q:'كم عدد القارات في العالم؟',a:'6',cat:'جغرافيا'},
-  {q:'ما هو أطول نهر في العالم؟',a:'نيل',cat:'جغرافيا'},
-  {q:'في أي دولة تقع الأهرامات؟',a:'مصر',cat:'تاريخ'},
-  {q:'متى اكتشف كولومبوس أمريكا؟',a:'1492',cat:'تاريخ'},
-  {q:'من هو مؤسس الدولة السعودية الأولى؟',a:'محمد بن سعود',cat:'تاريخ'},
-  {q:'كم عدد أيام الحرب العالمية الثانية؟',a:'6 سنوات',cat:'تاريخ'},
-  {q:'ما هي عاصمة اليابان؟',a:'طوكيو',cat:'جغرافيا'},
-  {q:'كم عدد ألوان قوس قزح؟',a:'7',cat:'علوم'},
-  {q:'ما هو أسرع حيوان بري؟',a:'الفهد',cat:'علوم'},
-  {q:'كم عدد كواكب المجموعة الشمسية؟',a:'8',cat:'علوم'},
-  {q:'ما هو العنصر الكيميائي للذهب؟',a:'Au',cat:'علوم'},
-];
-
-let currentQuestion = null;
-let timeLeft = 15;
-
 function showQuestion() {
   if(!selectedContinent) { showToast('اختر قارة أولاً (عبر العجلة)'); return; }
   currentQuestion = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
@@ -780,7 +762,7 @@ function showQuestion() {
   document.getElementById('qAnswer').classList.remove('show');
   document.getElementById('qOverlay').classList.add('active');
   document.getElementById('qHostControls').style.display = isHost ? 'flex' : 'none';
-  
+
   timeLeft = 15;
   document.getElementById('qTimer').textContent = '⏱ ' + timeLeft;
   if(timerInterval) clearInterval(timerInterval);
@@ -819,29 +801,28 @@ function updateGameUI(room) {
   state.scores = room.scores || { blue: 0, red: 0 };
   state.round = room.round || 1;
   currentTurn = room.currentTurn || 'blue';
-  
+
   document.getElementById('gameBlueScore').textContent = '🔵 ' + state.scores.blue;
   document.getElementById('gameRedScore').textContent = '🔴 ' + state.scores.red;
   document.getElementById('turnIndicator').textContent = (currentTurn==='blue'?'🎯 دور الفريق الأزرق':'🎯 دور الفريق الأحمر');
   document.getElementById('roundInfo').textContent = 'الجولة ' + state.round;
-  
+
   document.getElementById('hostControls').style.display = isHost ? 'block' : 'none';
-  
+
   const players = Object.values(state.players);
-  document.getElementById('gamePlayers').innerHTML = players.map(p => 
+  document.getElementById('gamePlayers').innerHTML = players.map(p =>
     `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
       <span>${p.name} ${p.id===playerId?'(أنت)':''}</span>
       <span style="color:var(--accent)">${p.score||0}</span>
     </div>`
   ).join('');
-  
-  // Update map ownership
+
   if(g) {
-    g.selectAll('.country').attr('class', d => {
+    g.selectAll('.country').attr('class', function() {
       const cont = d3.select(this).attr('data-continent');
       const owner = state.countries[cont];
       return 'country' + (owner ? ' owned' : '');
-    }).style('stroke', d => {
+    }).style('stroke', function() {
       const cont = d3.select(this).attr('data-continent');
       const owner = state.countries[cont];
       return owner === 'blue' ? '#3B82F6' : owner === 'red' ? '#EF4444' : null;
