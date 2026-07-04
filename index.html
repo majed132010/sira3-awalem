@@ -425,6 +425,12 @@ function enterLobby(){
   document.getElementById('copyHint').textContent = 'شارك الكود مع أصدقائك';
   if(isHost) document.getElementById('hostStart').style.display = 'block';
   else document.getElementById('waitHost').style.display = 'block';
+
+  // Listen for game start
+  roomRef.child('status').on('value', snap=>{
+    if(snap.val()==='playing') startGameView();
+  });
+
   roomRef.child('players').on('value', snap=>{
     const players = snap.val() || {};
     let html = '';
@@ -457,10 +463,6 @@ function startGame(){
 // ═══════════════════════════════════════════════════════
 //  GAME INIT
 // ═══════════════════════════════════════════════════════
-roomRef && roomRef.child('status').on('value', snap=>{
-  if(snap.val()==='playing') startGameView();
-});
-
 function startGameView(){
   showScreen('scrGame');
   document.getElementById('gameCode').textContent = 'غرفة ' + roomCode;
