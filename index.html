@@ -55,6 +55,8 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
 .country{stroke:rgba(6,20,45,0.55);stroke-width:0.5;stroke-linejoin:round;transition:all 0.3s;cursor:pointer}
 .country:hover{stroke:#FBBF24;stroke-width:1.5;filter:brightness(1.15)}
 .country.owned{stroke:#FBBF24;stroke-width:1.2}
+.country.owned-blue{fill:url(#grad_blue) !important;stroke:#3B82F6;stroke-width:1.5}
+.country.owned-red{fill:url(#grad_red) !important;stroke:#EF4444;stroke-width:1.5}
 .country-label{fill:#FBBF24;font-size:8px;font-weight:900;text-anchor:middle;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.8)}
 .continent-label{fill:#fff;font-size:13px;font-weight:900;text-anchor:middle;pointer-events:none;text-shadow:0 1px 4px rgba(0,0,0,0.9)}
 .ocean-grad{fill:url(#oceanGrad)}
@@ -92,6 +94,19 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#0F172A;border:1px solid var(--panel-br);color:#fff;padding:12px 20px;border-radius:12px;font-weight:700;font-size:14px;z-index:200;transition:transform .35s;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
 #toast.show{transform:translateX(-50%) translateY(0)}
 
+/* ===== شاشة الفوز ===== */
+.win-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:110;display:none;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(10px)}
+.win-overlay.active{display:flex}
+.win-title{font-size:42px;font-weight:900;color:var(--gold);text-shadow:0 4px 20px rgba(245,158,11,0.4);margin-bottom:16px;text-align:center}
+.win-sub{font-size:18px;color:var(--muted);margin-bottom:24px;text-align:center}
+.win-stats{background:var(--card);border:1px solid var(--card-br);border-radius:16px;padding:20px;min-width:280px;text-align:center;margin-bottom:20px}
+
+/* ===== Loading ===== */
+.loading-overlay{position:fixed;inset:0;background:rgba(11,18,32,0.95);z-index:120;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-overlay.active{display:flex}
+.spinner{width:48px;height:48px;border:4px solid rgba(245,158,11,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 /* ===== Responsive ===== */
 @media(min-width:900px){
   .game-layout{display:flex;gap:16px;align-items:flex-start}
@@ -105,8 +120,15 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
 }
 </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div style="color:var(--gold);font-weight:700">جاري التحميل...</div>
+</div>
 
 <!-- شاشة البداية -->
 <div id="homeScreen" class="screen active">
@@ -120,15 +142,14 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
       </div>
       <div id="teamSetup" style="margin-bottom:10px">
         <div class="row" style="margin-bottom:8px">
-          <div class="mode-chip on" id="winPoints" onclick="setWin('points')">🏆 نقاط</div>
-          <div class="mode-chip" id="winCountries" onclick="setWin('countries')">🗺 دول</div>
+          <div class="mode-chip on" id="winCountries" onclick="setWin('countries')">🗺 دول</div>
         </div>
-        <input id="targetInput" class="inp" type="number" value="700" min="100" max="5000" step="50" placeholder="الهدف (نقطة/دولة)" style="margin-bottom:10px">
+        <input id="targetInput" class="inp" type="number" value="6" min="1" max="6" step="1" placeholder="عدد القارات للفوز" style="margin-bottom:10px">
       </div>
       <input id="playerName" class="inp" placeholder="اسمك (مثال: سامي)" maxlength="16" style="margin-bottom:10px">
       <button class="btn-gold" style="width:100%" onclick="createRoom()">⚔️ إنشاء غرفة</button>
       <div style="margin:12px 0;text-align:center;color:var(--muted);font-size:13px">— أو —</div>
-      <input id="joinCode" class="inp" placeholder="كود الغرفة (4 أحرف)" maxlength="4" style="margin-bottom:10px;text-transform:uppercase">
+      <input id="joinCode" class="inp" placeholder="كود الغرفة (6 أحرف)" maxlength="6" style="margin-bottom:10px;text-transform:uppercase">
       <button class="btn-ghost" style="width:100%" onclick="joinRoom()">🔗 الانضمام للغرفة</button>
     </div>
   </div>
@@ -144,13 +165,13 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
           <h2 style="color:var(--gold);font-size:18px">ردهة الانتظار</h2>
           <span></span>
         </div>
-        <div class="code-big" id="lobbyCode" onclick="copyCode()">----</div>
+        <div class="code-big" id="lobbyCode" onclick="copyCode()">------</div>
         <p style="text-align:center;color:var(--muted);font-size:12px;margin-top:6px">اضغط لنسخ الكود وشاركه</p>
         <div class="score-bar" style="margin-top:14px">
           <div class="score-badge" style="background:rgba(59,130,246,0.25);border:1px solid var(--blue)" id="blueScore">🔵 0</div>
           <div style="text-align:center">
             <div style="font-size:12px;color:var(--muted)" id="lobbyMode">فريقان</div>
-            <div style="font-size:12px;color:var(--muted)" id="lobbyWin">الفوز: 700 نقطة</div>
+            <div style="font-size:12px;color:var(--muted)" id="lobbyWin">الفوز: 6 قارات</div>
           </div>
           <div class="score-badge" style="background:rgba(239,68,68,0.25);border:1px solid var(--red)" id="redScore">🔴 0</div>
         </div>
@@ -218,9 +239,9 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
 </div>
 
 <!-- عجلة الدوران -->
-<div class="wheel-overlay" id="wheelOverlay">
+<div class="wheel-overlay" id="wheelOverlay" onclick="closeWheel(event)">
   <div class="wheel-title">🎯 اضغط للدوران</div>
-  <div class="wheel-container">
+  <div class="wheel-container" onclick="event.stopPropagation()">
     <div class="wheel-pointer"></div>
     <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 200 200"></svg>
     <div class="wheel-center">GO</div>
@@ -229,19 +250,27 @@ h1.logo{font-size:34px;font-weight:900;background:linear-gradient(180deg,#FDE68A
 </div>
 
 <!-- نافذة السؤال -->
-<div class="q-overlay" id="qOverlay">
-  <div class="q-card">
+<div class="q-overlay" id="qOverlay" onclick="closeQuestion(event)">
+  <div class="q-card" onclick="event.stopPropagation()">
     <div class="q-timer" id="qTimer">⏱ 15</div>
     <div class="q-category" id="qCategory">فئة السؤال</div>
     <div class="q-text" id="qText">نص السؤال يظهر هنا…</div>
     <div class="q-answer" id="qAnswer">الإجابة الصحيحة</div>
     <div class="q-host-controls" id="qHostControls">
       <button class="btn-sm" onclick="revealAnswer()">👁 كشف الإجابة</button>
-      <button class="btn-blue" onclick="awardPoints('blue')">+10 أزرق</button>
-      <button class="btn-red" onclick="awardPoints('red')">+10 أحمر</button>
+      <button class="btn-blue" onclick="awardCapture('blue')">🔵 احتلال</button>
+      <button class="btn-red" onclick="awardCapture('red')">🔴 احتلال</button>
       <button class="btn-ghost" onclick="closeQuestion()">إغلاق</button>
     </div>
   </div>
+</div>
+
+<!-- شاشة الفوز -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-title" id="winTitle">🏆 الفائز!</div>
+  <div class="win-sub" id="winSub">تهانينا</div>
+  <div class="win-stats" id="winStats"></div>
+  <button class="btn-gold" onclick="backToHome()">🔄 لعبة جديدة</button>
 </div>
 
 <!-- Toast -->
@@ -272,8 +301,8 @@ let playerId = null;
 let playerName = '';
 let isHost = false;
 let gameMode = 'team';
-let winType = 'points';
-let target = 700;
+let winType = 'countries';
+let target = 6;
 let currentTurn = 'blue';
 let timerInterval = null;
 let selectedContinent = null;
@@ -281,6 +310,9 @@ let wheelAngle = 0;
 let isSpinning = false;
 let currentQuestion = null;
 let timeLeft = 15;
+let roomListener = null;
+let worldAtlasData = null;
+let mapReady = false;
 
 const state = {
   players: {},
@@ -327,6 +359,20 @@ const QUESTIONS = [
 ];
 
 /* ═══════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════ */
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function showLoading(show) {
+  document.getElementById('loadingOverlay').classList.toggle('active', show);
+}
+
+/* ═══════════════════════════════════════
    FIREBASE INIT
    ═══════════════════════════════════════ */
 function initFirebase() {
@@ -343,7 +389,7 @@ function initFirebase() {
 function generateCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
-  for(let i=0;i<4;i++) code += chars.charAt(Math.floor(Math.random()*chars.length));
+  for(let i=0;i<6;i++) code += chars.charAt(Math.floor(Math.random()*chars.length));
   return code;
 }
 
@@ -354,11 +400,24 @@ function generateId() {
 /* ═══════════════════════════════════════
    UI HELPERS
    ═══════════════════════════════════════ */
+let toastQueue = [];
+let toastTimer = null;
+
 function showToast(msg) {
+  toastQueue.push(msg);
+  if (!toastTimer) processToastQueue();
+}
+
+function processToastQueue() {
+  if (toastQueue.length === 0) { toastTimer = null; return; }
+  const msg = toastQueue.shift();
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  toastTimer = setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(processToastQueue, 300);
+  }, 2500);
 }
 
 function setMode(m) {
@@ -370,7 +429,6 @@ function setMode(m) {
 
 function setWin(w) {
   winType = w;
-  document.getElementById('winPoints').classList.toggle('on', w==='points');
   document.getElementById('winCountries').classList.toggle('on', w==='countries');
 }
 
@@ -385,6 +443,11 @@ function copyCode() {
   showToast('تم نسخ الكود: ' + code);
 }
 
+function backToHome() {
+  document.getElementById('winOverlay').classList.remove('active');
+  leaveRoom();
+}
+
 /* ═══════════════════════════════════════
    ROOM ACTIONS
    ═══════════════════════════════════════ */
@@ -394,9 +457,10 @@ function createRoom() {
   playerName = name;
   playerId = generateId();
   roomCode = generateCode();
-  target = parseInt(document.getElementById('targetInput').value) || 700;
+  target = parseInt(document.getElementById('targetInput').value) || 6;
 
   if(!db) { showToast('Firebase غير متصل'); return; }
+  showLoading(true);
 
   const roomData = {
     code: roomCode,
@@ -419,7 +483,8 @@ function createRoom() {
     countries: {},
     scores: { blue: 0, red: 0 },
     currentTurn: 'blue',
-    round: 1
+    round: 1,
+    log: {}
   };
 
   db.ref('rooms/' + roomCode).set(roomData)
@@ -430,14 +495,15 @@ function createRoom() {
     })
     .catch(err => {
       showToast('خطأ في الإنشاء: ' + err.message);
-    });
+    })
+    .finally(() => showLoading(false));
 }
 
 function joinRoom() {
   const code = document.getElementById('joinCode').value.trim().toUpperCase();
   const name = document.getElementById('playerName').value.trim();
 
-  if(!/^[A-Z0-9]{4}$/.test(code)) { showToast('أدخل كود صحيح (4 رموز)'); return; }
+  if(!/^[A-Z0-9]{6}$/.test(code)) { showToast('أدخل كود صحيح (6 رموز)'); return; }
   if(!name) { showToast('أدخل اسمك أولاً'); return; }
 
   playerName = name;
@@ -445,12 +511,13 @@ function joinRoom() {
   roomCode = code;
 
   if(!db) { showToast('Firebase غير متصل'); return; }
+  showLoading(true);
 
-  const roomRef = db.ref('rooms/' + code);
-  roomRef.once('value').then(snap => {
+  const roomRefCheck = db.ref('rooms/' + code);
+  roomRefCheck.once('value').then(snap => {
     const room = snap.val();
-    if(!room) { showToast('الغرفة غير موجودة!'); return; }
-    if(room.status === 'finished') { showToast('اللعبة منتهية'); return; }
+    if(!room) { showToast('الغرفة غير موجودة!'); showLoading(false); return Promise.reject('no room'); }
+    if(room.status === 'finished') { showToast('اللعبة منتهية'); showLoading(false); return Promise.reject('finished'); }
 
     const players = Object.values(room.players || {});
     const blueCount = players.filter(p => p.team === 'blue').length;
@@ -464,24 +531,38 @@ function joinRoom() {
       online: true,
       score: 0,
       joinedAt: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+      // onDisconnect: remove player when they disconnect
+      db.ref('rooms/' + code + '/players/' + playerId).onDisconnect().remove();
     });
   }).then(() => {
     isHost = false;
     enterLobby();
     showToast('انضممت للغرفة ' + code);
   }).catch(err => {
-    showToast('خطأ في الانضمام: ' + err.message);
-  });
+    if (err && err !== 'no room' && err !== 'finished') {
+      showToast('خطأ في الانضمام: ' + err.message);
+    }
+  }).finally(() => showLoading(false));
 }
 
 function leaveRoom() {
   if(roomRef && playerId) {
     roomRef.child('players/' + playerId).remove();
+    if (roomListener) {
+      roomRef.off('value', roomListener);
+      roomListener = null;
+    }
+    // Cancel onDisconnect
+    db.ref('rooms/' + roomCode + '/players/' + playerId).onDisconnect().cancel();
   }
   roomRef = null;
   roomCode = null;
   playerId = null;
   isHost = false;
+  state.started = false;
+  mapReady = false;
+  selectedContinent = null;
   switchScreen('homeScreen');
 }
 
@@ -489,21 +570,36 @@ function enterLobby() {
   switchScreen('lobbyScreen');
   document.getElementById('lobbyCode').textContent = roomCode;
   document.getElementById('lobbyMode').textContent = gameMode === 'team' ? 'فريقان' : 'فردي';
-  document.getElementById('lobbyWin').textContent = 'الفوز: ' + target + ' ' + (winType==='points'?'نقطة':'دولة');
+  document.getElementById('lobbyWin').textContent = 'الفوز: ' + target + ' قارات';
 
   roomRef = db.ref('rooms/' + roomCode);
-  roomRef.on('value', snap => {
+
+  // Remove old listener if exists
+  if (roomListener) {
+    roomRef.off('value', roomListener);
+  }
+
+  roomListener = roomRef.on('value', snap => {
     const room = snap.val();
-    if(!room) return;
+    if(!room) {
+      showToast('الغرفة أُغلقت');
+      leaveRoom();
+      return;
+    }
     updateLobby(room);
     if(room.status === 'playing' && !state.started) {
       state.started = true;
       switchScreen('gameScreen');
-      initMap();
+      initMap().then(() => {
+        mapReady = true;
+        updateGameUI(room);
+      });
+    }
+    if(room.status === 'playing' && mapReady) {
       updateGameUI(room);
     }
-    if(room.status === 'playing') {
-      updateGameUI(room);
+    if(room.status === 'finished') {
+      showWinScreen(room);
     }
   });
 }
@@ -519,14 +615,14 @@ function updateLobby(room) {
   document.getElementById('redScore').textContent = '🔴 ' + (room.scores?.red || 0);
 
   document.getElementById('blueList').innerHTML = blue.map(p =>
-    `<div class="pl-row">${p.name} ${p.id===room.host?'<span class="host-tag">قائد</span>':''} ${p.id===playerId?'(أنت)':''}</div>`
+    `<div class="pl-row">${escapeHtml(p.name)} ${p.id===room.host?'<span class="host-tag">قائد</span>':''} ${p.id===playerId?'(أنت)':''}</div>`
   ).join('');
   document.getElementById('redList').innerHTML = red.map(p =>
-    `<div class="pl-row">${p.name} ${p.id===room.host?'<span class="host-tag">قائد</span>':''} ${p.id===playerId?'(أنت)':''}</div>`
+    `<div class="pl-row">${escapeHtml(p.name)} ${p.id===room.host?'<span class="host-tag">قائد</span>':''} ${p.id===playerId?'(أنت)':''}</div>`
   ).join('');
 
   document.getElementById('allPlayers').innerHTML = players.map(p =>
-    `<div style="margin-bottom:4px">${p.name} ${p.id===playerId?'<span style="color:var(--accent)">(أنت)</span>':''}</div>`
+    `<div style="margin-bottom:4px">${escapeHtml(p.name)} ${p.id===playerId?'<span style="color:var(--accent)">(أنت)</span>':''}</div>`
   ).join('');
 
   const isHostPlayer = (room.host === playerId);
@@ -556,6 +652,8 @@ function endGame() {
 let svg, path, g;
 
 function initMap() {
+  if (mapReady && worldAtlasData) return Promise.resolve();
+
   svg = d3.select('#mapSvg');
   svg.selectAll('*').remove();
 
@@ -565,6 +663,7 @@ function initMap() {
 
   const defs = svg.append('defs');
 
+  // Ocean gradient
   const oceanGrad = defs.append('radialGradient').attr('id','oceanGrad')
     .attr('cx','42%').attr('cy','42%').attr('r','75%');
   oceanGrad.append('stop').attr('offset','0%').attr('stop-color','#38BDF8').attr('stop-opacity',0.9);
@@ -572,6 +671,7 @@ function initMap() {
   oceanGrad.append('stop').attr('offset','78%').attr('stop-color','#0369A1').attr('stop-opacity',0.9);
   oceanGrad.append('stop').attr('offset','100%').attr('stop-color','#082F49').attr('stop-opacity',1);
 
+  // Continent gradients
   Object.entries(CONTINENTS).forEach(([key, c]) => {
     const grad = defs.append('linearGradient').attr('id','grad_'+key.replace(/ /g,'_'))
       .attr('x1',0).attr('y1',0).attr('x2',1).attr('y2',1);
@@ -580,6 +680,19 @@ function initMap() {
     grad.append('stop').attr('offset','1').attr('stop-color',c.grad[2]);
   });
 
+  // Team gradients for capture
+  const blueGrad = defs.append('linearGradient').attr('id','grad_blue')
+    .attr('x1',0).attr('y1',0).attr('x2',1).attr('y2',1);
+  blueGrad.append('stop').attr('offset','0').attr('stop-color','#BFDBFE');
+  blueGrad.append('stop').attr('offset','0.5').attr('stop-color','#3B82F6');
+  blueGrad.append('stop').attr('offset','1').attr('stop-color','#1E3A8A');
+
+  const redGrad = defs.append('linearGradient').attr('id','grad_red')
+    .attr('x1',0).attr('y1',0).attr('x2',1).attr('y2',1);
+  redGrad.append('stop').attr('offset','0').attr('stop-color','#FECACA');
+  redGrad.append('stop').attr('offset','0.5').attr('stop-color','#EF4444');
+  redGrad.append('stop').attr('offset','1').attr('stop-color','#B91C1C');
+
   svg.append('rect').attr('class','ocean-grad').attr('x',-width).attr('y',-height).attr('width',width*3).attr('height',height*3);
 
   const graticule = d3.geoGraticule();
@@ -587,54 +700,65 @@ function initMap() {
 
   g = svg.append('g');
 
-  d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(world => {
-    const countries = topojson.feature(world, world.objects.countries);
+  if (worldAtlasData) {
+    drawMap(worldAtlasData);
+    return Promise.resolve();
+  }
 
-    const countryContinent = {};
-    countries.features.forEach(d => {
-      const centroid = d3.geoCentroid(d);
-      const [lon, lat] = centroid;
-      let cont = 'Oceania';
-      if(lat > 35 && lon > -15 && lon < 45) cont = 'Europe';
-      else if(lat > -35 && lon > -20 && lon < 55) cont = 'Africa';
-      else if(lat > 10 && lon > 55 && lon < 145) cont = 'Asia';
-      else if(lat > 15 && lon < -30) cont = 'North America';
-      else if(lat < 15 && lon < -30) cont = 'South America';
-      else if(lon > 110 && lat < -10) cont = 'Oceania';
-      countryContinent[d.id] = cont;
-    });
-
-    g.selectAll('path')
-      .data(countries.features)
-      .enter().append('path')
-      .attr('class','country')
-      .attr('d', path)
-      .attr('fill', d => {
-        const cont = countryContinent[d.id];
-        return 'url(#grad_' + (cont ? cont.replace(/ /g,'_') : 'Oceania') + ')';
-      })
-      .attr('data-continent', d => countryContinent[d.id])
-      .on('click', function(event, d) {
-        const cont = d3.select(this).attr('data-continent');
-        if(cont) selectContinent(cont);
-      });
-
-    Object.entries(CONTINENTS).forEach(([key, c]) => {
-      const center = continentCenter(key);
-      if(center) {
-        svg.append('text')
-          .attr('class','continent-label')
-          .attr('x', center[0])
-          .attr('y', center[1])
-          .text(c.ar)
-          .style('fill', c.color)
-          .style('cursor','pointer')
-          .on('click', () => selectContinent(key));
-      }
-    });
+  return d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(world => {
+    worldAtlasData = world;
+    drawMap(world);
   }).catch(err => {
     console.error('Map load error:', err);
     showToast('تعذر تحميل الخريطة');
+  });
+}
+
+function drawMap(world) {
+  const countries = topojson.feature(world, world.objects.countries);
+
+  const countryContinent = {};
+  countries.features.forEach(d => {
+    const centroid = d3.geoCentroid(d);
+    const [lon, lat] = centroid;
+    let cont = 'Oceania';
+    if(lat > 35 && lon > -15 && lon < 45) cont = 'Europe';
+    else if(lat > -35 && lon > -20 && lon < 55) cont = 'Africa';
+    else if(lat > 10 && lon > 55 && lon < 145) cont = 'Asia';
+    else if(lat > 15 && lon < -30) cont = 'North America';
+    else if(lat < 15 && lon < -30) cont = 'South America';
+    else if(lon > 110 && lat < -10) cont = 'Oceania';
+    countryContinent[d.id] = cont;
+  });
+
+  g.selectAll('path')
+    .data(countries.features)
+    .enter().append('path')
+    .attr('class','country')
+    .attr('d', path)
+    .attr('fill', d => {
+      const cont = countryContinent[d.id];
+      return 'url(#grad_' + (cont ? cont.replace(/ /g,'_') : 'Oceania') + ')';
+    })
+    .attr('data-continent', d => countryContinent[d.id])
+    .attr('data-id', d => d.id)
+    .on('click', function(event, d) {
+      const cont = d3.select(this).attr('data-continent');
+      if(cont) selectContinent(cont);
+    });
+
+  Object.entries(CONTINENTS).forEach(([key, c]) => {
+    const center = continentCenter(key);
+    if(center) {
+      svg.append('text')
+        .attr('class','continent-label')
+        .attr('x', center[0])
+        .attr('y', center[1])
+        .text(c.ar)
+        .style('fill', c.color)
+        .style('cursor','pointer')
+        .on('click', () => selectContinent(key));
+    }
   });
 }
 
@@ -709,6 +833,12 @@ function openWheel() {
   drawWheel();
 }
 
+function closeWheel(e) {
+  if (e.target === document.getElementById('wheelOverlay')) {
+    document.getElementById('wheelOverlay').classList.remove('active');
+  }
+}
+
 function spinWheel() {
   if(isSpinning) return;
   isSpinning = true;
@@ -741,6 +871,16 @@ function spinWheel() {
       btn.disabled = false;
       const winner = WHEEL_ITEMS[targetIndex];
       showToast('🎯 وقع الاختيار على: ' + winner.label);
+
+      // Sync to Firebase
+      if (roomRef && isHost) {
+        roomRef.child('wheelResult').set({
+          continent: winner.continent,
+          label: winner.label,
+          ts: firebase.database.ServerValue.TIMESTAMP
+        });
+      }
+
       setTimeout(() => {
         document.getElementById('wheelOverlay').classList.remove('active');
         selectContinent(winner.continent);
@@ -756,10 +896,31 @@ function spinWheel() {
 function showQuestion() {
   if(!selectedContinent) { showToast('اختر قارة أولاً (عبر العجلة)'); return; }
   currentQuestion = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
-  document.getElementById('qCategory').textContent = currentQuestion.cat + ' — ' + CONTINENTS[selectedContinent].ar;
-  document.getElementById('qText').textContent = currentQuestion.q;
-  document.getElementById('qAnswer').textContent = currentQuestion.a;
-  document.getElementById('qAnswer').classList.remove('show');
+
+  // Sync to Firebase
+  if (roomRef && isHost) {
+    roomRef.child('currentQuestion').set({
+      q: currentQuestion.q,
+      a: currentQuestion.a,
+      cat: currentQuestion.cat,
+      continent: selectedContinent,
+      revealed: false,
+      ts: firebase.database.ServerValue.TIMESTAMP
+    });
+  }
+
+  renderQuestion(currentQuestion, selectedContinent, false);
+}
+
+function renderQuestion(q, continent, revealed) {
+  document.getElementById('qCategory').textContent = q.cat + ' — ' + CONTINENTS[continent].ar;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('qAnswer').textContent = q.a;
+
+  const ansEl = document.getElementById('qAnswer');
+  if (revealed) ansEl.classList.add('show');
+  else ansEl.classList.remove('show');
+
   document.getElementById('qOverlay').classList.add('active');
   document.getElementById('qHostControls').style.display = isHost ? 'flex' : 'none';
 
@@ -776,20 +937,91 @@ function showQuestion() {
 function revealAnswer() {
   document.getElementById('qAnswer').classList.add('show');
   if(timerInterval) clearInterval(timerInterval);
+
+  if (roomRef && isHost) {
+    roomRef.child('currentQuestion/revealed').set(true);
+  }
 }
 
-function awardPoints(team) {
-  if(!roomRef) return;
-  const delta = 10;
-  const newScore = (state.scores[team] || 0) + delta;
-  roomRef.child('scores').update({ [team]: newScore });
-  addLog(`✅ ${team==='blue'?'الأزرق':'الأحمر'} +${delta} نقاط`);
+function awardCapture(team) {
+  if(!roomRef || !selectedContinent) return;
+
+  // Use atomic increment to avoid race condition
+  const updates = {};
+  updates['countries/' + selectedContinent] = team;
+  updates['scores/' + team] = firebase.database.ServerValue.increment(1);
+
+  roomRef.update(updates).then(() => {
+    addLog(`🏴 ${team==='blue'?'الأزرق':'الأحمر'} احتل ${CONTINENTS[selectedContinent].ar}`);
+    checkWin();
+  });
+
   closeQuestion();
 }
 
-function closeQuestion() {
+function closeQuestion(e) {
+  if (e && e.target !== document.getElementById('qOverlay') && e.target !== document.getElementById('qOverlay')) {
+    // Only close if clicking overlay background or explicit button
+    if (e.target && !e.target.closest('.q-card') && e.target.id === 'qOverlay') {
+      document.getElementById('qOverlay').classList.remove('active');
+    }
+    return;
+  }
   document.getElementById('qOverlay').classList.remove('active');
   if(timerInterval) clearInterval(timerInterval);
+
+  if (roomRef && isHost) {
+    roomRef.child('currentQuestion').remove();
+  }
+}
+
+/* ═══════════════════════════════════════
+   WIN LOGIC
+   ═══════════════════════════════════════ */
+function checkWin() {
+  if (!roomRef) return;
+  roomRef.child('scores').once('value').then(snap => {
+    const scores = snap.val() || { blue: 0, red: 0 };
+    if (scores.blue >= target) {
+      endGameWithWinner('blue');
+    } else if (scores.red >= target) {
+      endGameWithWinner('red');
+    }
+  });
+}
+
+function endGameWithWinner(winner) {
+  if (!roomRef || !isHost) return;
+  roomRef.update({
+    status: 'finished',
+    winner: winner,
+    finishedAt: firebase.database.ServerValue.TIMESTAMP
+  });
+}
+
+function showWinScreen(room) {
+  const winner = room.winner;
+  const scores = room.scores || { blue: 0, red: 0 };
+
+  document.getElementById('winTitle').textContent = winner === 'blue' ? '🔵 الفريق الأزرق فاز!' : '🔴 الفريق الأحمر فاز!';
+  document.getElementById('winSub').textContent = `باحتلال ${scores[winner] || 0} قارات`;
+
+  const players = Object.values(room.players || {});
+  const winnerPlayers = players.filter(p => p.team === winner || (gameMode === 'solo' && p.id === winner));
+
+  document.getElementById('winStats').innerHTML = `
+    <div style="font-size:14px;color:var(--muted);margin-bottom:8px">اللاعبون الفائزون</div>
+    ${winnerPlayers.map(p => `<div style="font-size:16px;font-weight:700;color:var(--gold);margin:4px 0">${escapeHtml(p.name)}</div>`).join('')}
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1)">
+      <div style="font-size:13px;color:var(--muted)">النتيجة النهائية</div>
+      <div style="display:flex;justify-content:center;gap:20px;margin-top:8px">
+        <div style="color:var(--blue);font-weight:900">🔵 ${scores.blue || 0}</div>
+        <div style="color:var(--red);font-weight:900">🔴 ${scores.red || 0}</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('winOverlay').classList.add('active');
 }
 
 /* ═══════════════════════════════════════
@@ -812,30 +1044,54 @@ function updateGameUI(room) {
   const players = Object.values(state.players);
   document.getElementById('gamePlayers').innerHTML = players.map(p =>
     `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span>${p.name} ${p.id===playerId?'(أنت)':''}</span>
+      <span>${escapeHtml(p.name)} ${p.id===playerId?'(أنت)':''}</span>
       <span style="color:var(--accent)">${p.score||0}</span>
     </div>`
   ).join('');
+
+  // Sync log from Firebase
+  if (room.log) {
+    const logEntries = Object.entries(room.log).sort((a,b) => (a[1].ts||0) - (b[1].ts||0));
+    const logEl = document.getElementById('gameLog');
+    logEl.innerHTML = '';
+    logEntries.forEach(([key, entry]) => {
+      const div = document.createElement('div');
+      div.style.marginBottom = '6px';
+      div.textContent = entry.text || '';
+      logEl.prepend(div);
+    });
+  }
+
+  // Sync question from Firebase
+  if (room.currentQuestion && !document.getElementById('qOverlay').classList.contains('active')) {
+    renderQuestion(room.currentQuestion, room.currentQuestion.continent || selectedContinent || 'Africa', room.currentQuestion.revealed || false);
+  }
+
+  // Sync wheel result
+  if (room.wheelResult && room.wheelResult.continent) {
+    selectContinent(room.wheelResult.continent);
+  }
 
   if(g) {
     g.selectAll('.country').attr('class', function() {
       const cont = d3.select(this).attr('data-continent');
       const owner = state.countries[cont];
-      return 'country' + (owner ? ' owned' : '');
-    }).style('stroke', function() {
-      const cont = d3.select(this).attr('data-continent');
-      const owner = state.countries[cont];
-      return owner === 'blue' ? '#3B82F6' : owner === 'red' ? '#EF4444' : null;
+      let cls = 'country';
+      if (owner === 'blue') cls += ' owned-blue';
+      else if (owner === 'red') cls += ' owned-red';
+      return cls;
     });
   }
 }
 
 function addLog(msg) {
-  const log = document.getElementById('gameLog');
-  const div = document.createElement('div');
-  div.style.marginBottom = '6px';
-  div.textContent = msg;
-  log.prepend(div);
+  if (!roomRef) return;
+  const logRef = roomRef.child('log').push();
+  logRef.set({
+    text: msg,
+    ts: firebase.database.ServerValue.TIMESTAMP,
+    playerId: playerId
+  });
 }
 
 /* ═══════════════════════════════════════
